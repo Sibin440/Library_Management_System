@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Manage Users</title>
+</head>
+<body>
+<h2>Users</h2>
+<table>
+    <thead><tr><th>Username</th><th>Email</th><th>Roles</th><th>Action</th></tr></thead>
+    <tbody>
+    <tr th:each="u : ${users}">
+        <td th:text="${u.username}"></td>
+        <td th:text="${u.email}"></td>
+        <td>
+            <span th:each="r : ${u.roles}" th:text="${r.name} + ' '"></span>
+        </td>
+        <td>
+            <form th:action="@{'/admin/users/' + ${u.id} + '/roles'}" method="post">
+                <label><input type="checkbox" name="roles" value="ROLE_USER"/> USER</label>
+                <label><input type="checkbox" name="roles" value="ROLE_LIBRARIAN"/> LIBRARIAN</label>
+                <label><input type="checkbox" name="roles" value="ROLE_ADMIN"/> ADMIN</label>
+                <button type="submit">Update</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<p><a th:href="@{/admin/dashboard}">Back</a></p>
+</body>
+</html>

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class BookController {
     }
     
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
     public ResponseEntity<Book> addBook(@RequestBody Book book) {
         logger.info("Request received to add a new book: {}", book);
         Book savedBook = bookRepository.save(book);
@@ -51,6 +53,7 @@ public class BookController {
     }
     
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
     public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book updatedBook) {
         logger.info("Request received to update book with ID: {}", id);
         return bookRepository.findById(id)
@@ -66,6 +69,7 @@ public class BookController {
     }
     
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         logger.info("Request received to delete book with ID: {}", id);
         if (bookRepository.existsById(id)) {

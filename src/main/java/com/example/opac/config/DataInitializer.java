@@ -3,6 +3,7 @@ package com.example.opac.config;
 
 import com.example.opac.model.Book;
 import com.example.opac.repository.BookRepository;
+import com.example.opac.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,15 @@ public class DataInitializer {
             } else {
                 System.out.println("Database already contains books. Skipping initialization.");
             }
+        };
+    }
+
+    @Bean
+    CommandLineRunner initUsers(UserService userService) {
+        return args -> {
+            // create roles and an admin user if not present
+            userService.createAdminIfNotExists("admin", "admin@example.com", "adminpass");
+            System.out.println("Ensured admin user exists (username=admin)");
         };
     }
 }
