@@ -1,62 +1,62 @@
--- V1: create core tables
+-- V1: create core tables (PostgreSQL compatible)
 
-CREATE TABLE roles (
-  id BIGINT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS roles (
+  id BIGSERIAL NOT NULL,
   name VARCHAR(255) NOT NULL,
   PRIMARY KEY (id)
-) ENGINE=InnoDB;
+);
 
-CREATE TABLE users (
-  id BIGINT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS users (
+  id BIGSERIAL NOT NULL,
   email VARCHAR(255) NOT NULL,
   enabled BOOLEAN NOT NULL DEFAULT TRUE,
   password VARCHAR(255) NOT NULL,
   username VARCHAR(255) NOT NULL,
   PRIMARY KEY (id)
-) ENGINE=InnoDB;
+);
 
-CREATE UNIQUE INDEX ux_users_email ON users(email);
-CREATE UNIQUE INDEX ux_users_username ON users(username);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_users_email ON users(email);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_users_username ON users(username);
 
-CREATE TABLE user_roles (
+CREATE TABLE IF NOT EXISTS user_roles (
   user_id BIGINT NOT NULL,
   role_id BIGINT NOT NULL,
   PRIMARY KEY (user_id, role_id)
-) ENGINE=InnoDB;
+);
 
-CREATE TABLE book (
-  id BIGINT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS book (
+  id BIGSERIAL NOT NULL,
   title VARCHAR(255),
   author VARCHAR(255),
   isbn VARCHAR(255),
   published_date DATE,
   available BOOLEAN DEFAULT TRUE,
   PRIMARY KEY (id)
-) ENGINE=InnoDB;
+);
 
-CREATE UNIQUE INDEX ux_book_isbn ON book(isbn);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_book_isbn ON book(isbn);
 
-CREATE TABLE loan (
-  id BIGINT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS loan (
+  id BIGSERIAL NOT NULL,
   book_id BIGINT NOT NULL,
   user_id BIGINT NOT NULL,
-  loan_date DATETIME,
-  due_date DATETIME,
-  returned_date DATETIME,
+  loan_date TIMESTAMP,
+  due_date TIMESTAMP,
+  returned_date TIMESTAMP,
   status VARCHAR(50),
   PRIMARY KEY (id)
-) ENGINE=InnoDB;
+);
 
-CREATE TABLE audit_log (
-  id BIGINT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS audit_log (
+  id BIGSERIAL NOT NULL,
   user_id BIGINT,
   action VARCHAR(255),
   entity VARCHAR(255),
   entity_id VARCHAR(255),
   details TEXT,
-  timestamp DATETIME,
+  timestamp TIMESTAMP,
   PRIMARY KEY (id)
-) ENGINE=InnoDB;
+);
 
 -- Foreign keys
 ALTER TABLE user_roles ADD CONSTRAINT fk_user_roles_user FOREIGN KEY (user_id) REFERENCES users (id);
