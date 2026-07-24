@@ -29,12 +29,8 @@ CREATE TABLE IF NOT EXISTS book (
   title VARCHAR(255),
   author VARCHAR(255),
   isbn VARCHAR(255),
-  published_date DATE,
-  available BOOLEAN DEFAULT TRUE,
   PRIMARY KEY (id)
 );
-
-CREATE UNIQUE INDEX IF NOT EXISTS ux_book_isbn ON book(isbn);
 
 CREATE TABLE IF NOT EXISTS loan (
   id BIGSERIAL NOT NULL,
