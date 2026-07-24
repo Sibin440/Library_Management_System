@@ -1,28 +1,355 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sign Up – OPAC Library System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0a0a1a, #1a0a2e, #0d1b2a);
+            position: relative;
+            overflow: hidden;
+            padding: 24px;
+        }
+
+        /* Animated blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        .blob-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #06b6d4, #3b82f6);
+            top: -150px; right: -100px;
+            animation: pulse 9s ease-in-out infinite;
+        }
+        .blob-2 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, #10b981, #06b6d4);
+            bottom: -100px; left: -100px;
+            animation: pulse 7s ease-in-out infinite reverse;
+        }
+        .blob-3 {
+            width: 250px; height: 250px;
+            background: radial-gradient(circle, #f59e0b, #ef4444);
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 11s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.15) translate(15px, 20px); }
+        }
+
+        .card {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 28px;
+            padding: 44px 44px;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+            position: relative;
+            z-index: 10;
+            animation: slideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .logo-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 8px 20px rgba(6,182,212,0.4);
+        }
+        .logo-text h1 { font-size: 20px; font-weight: 700; color: #fff; }
+        .logo-text p  { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+        .steps {
+            display: flex; gap: 6px; margin-bottom: 28px;
+        }
+        .step {
+            flex: 1; height: 4px; border-radius: 99px;
+            background: rgba(255,255,255,0.1);
+        }
+        .step.active { background: linear-gradient(90deg, #06b6d4, #3b82f6); }
+
+        .heading { margin-bottom: 28px; }
+        .heading h2 { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: -0.4px; }
+        .heading p  { font-size: 13.5px; color: rgba(255,255,255,0.45); margin-top: 5px; }
+
+        .alert {
+            background: rgba(239,68,68,0.12);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #fca5a5;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .alert-success {
+            background: rgba(16,185,129,0.12);
+            border-color: rgba(16,185,129,0.3);
+            color: #6ee7b7;
+        }
+
+        .form-row { display: flex; gap: 14px; }
+        .form-group { margin-bottom: 18px; flex: 1; }
+        label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 7px;
+            letter-spacing: 0.2px;
+        }
+
+        .input-wrap { position: relative; }
+        .input-icon {
+            position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+            font-size: 15px; opacity: 0.45; pointer-events: none;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 12px 14px 12px 40px;
+            color: #fff;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.2s;
+        }
+        input::placeholder { color: rgba(255,255,255,0.2); }
+        input:focus {
+            border-color: #06b6d4;
+            background: rgba(6,182,212,0.07);
+            box-shadow: 0 0 0 3px rgba(6,182,212,0.18);
+        }
+
+        .password-strength {
+            margin-top: 6px;
+            display: flex; gap: 4px;
+        }
+        .strength-bar {
+            flex: 1; height: 3px; border-radius: 99px;
+            background: rgba(255,255,255,0.08);
+            transition: background 0.3s;
+        }
+
+        .terms {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+        .terms input[type="checkbox"] {
+            width: 16px; height: 16px;
+            min-width: 16px;
+            accent-color: #06b6d4;
+            padding: 0;
+            margin-top: 2px;
+            border-radius: 4px;
+        }
+        .terms label {
+            font-size: 12.5px;
+            color: rgba(255,255,255,0.45);
+            margin: 0;
+            cursor: pointer;
+        }
+        .terms label a { color: #67e8f9; text-decoration: none; }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            color: #fff;
+            letter-spacing: 0.2px;
+            box-shadow: 0 8px 24px rgba(6,182,212,0.3);
+            transition: transform 0.15s, box-shadow 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(6,182,212,0.4); }
+        .btn:hover::after { opacity: 1; }
+        .btn:active { transform: translateY(0); }
+
+        .perks {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .perk {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 99px;
+            padding: 4px 12px;
+            font-size: 11.5px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .footer-text {
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 20px;
+        }
+        .footer-text a {
+            color: #67e8f9;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-text a:hover { color: #a5f3fc; }
+    </style>
 </head>
 <body>
-<h2>Sign Up</h2>
-<form th:action="@{/signup}" th:object="${user}" method="post">
-    <div>
-        <label>Username</label>
-        <input th:field="*{username}" />
+<!-- Background blobs -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div class="card">
+    <div class="logo">
+        <div class="logo-icon">📚</div>
+        <div class="logo-text">
+            <h1>OPAC</h1>
+            <p>Library Management System</p>
+        </div>
     </div>
-    <div>
-        <label>Email</label>
-        <input th:field="*{email}" />
+
+    <div class="steps">
+        <div class="step active"></div>
+        <div class="step active"></div>
+        <div class="step active"></div>
     </div>
-    <div>
-        <label>Password</label>
-        <input type="password" th:field="*{password}" />
+
+    <div class="heading">
+        <h2>Create your account</h2>
+        <p>Join thousands of readers managing their library</p>
     </div>
-    <div>
-        <button type="submit">Register</button>
+
+    <div class="perks">
+        <div class="perk">✅ Free forever</div>
+        <div class="perk">📖 Unlimited books</div>
+        <div class="perk">🔒 Secure</div>
     </div>
-</form>
-<p>Already have an account? <a th:href="@{/login}">Login</a></p>
+
+    <!-- Error message -->
+    <div th:if="${error}" class="alert">
+        ⚠️ <span th:text="${error}">Registration failed. Please try again.</span>
+    </div>
+
+    <!-- Success message -->
+    <div th:if="${success}" class="alert alert-success">
+        🎉 Account created! <a th:href="@{/login}" style="color:#6ee7b7; font-weight:600;">Click here to login →</a>
+    </div>
+
+    <form th:action="@{/signup}" th:object="${user}" method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="username" th:field="*{username}" placeholder="Choose a username" autocomplete="username" required/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <div class="input-wrap">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="email" th:field="*{email}" placeholder="you@example.com" autocomplete="email" required/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+                <span class="input-icon">🔑</span>
+                <input type="password" id="password" th:field="*{password}" placeholder="Min. 8 characters" autocomplete="new-password" required/>
+            </div>
+            <div class="password-strength" id="strengthBars">
+                <div class="strength-bar" id="b1"></div>
+                <div class="strength-bar" id="b2"></div>
+                <div class="strength-bar" id="b3"></div>
+                <div class="strength-bar" id="b4"></div>
+            </div>
+        </div>
+
+        <div class="terms">
+            <input type="checkbox" id="terms" required/>
+            <label for="terms">
+                I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+            </label>
+        </div>
+
+        <button type="submit" class="btn">Create Account →</button>
+    </form>
+
+    <p class="footer-text">
+        Already have an account? <a th:href="@{/login}">Sign in →</a>
+    </p>
+</div>
+
+<script>
+    // Password strength indicator
+    const pwd = document.getElementById('password');
+    const bars = [document.getElementById('b1'), document.getElementById('b2'), document.getElementById('b3'), document.getElementById('b4')];
+    const colors = ['#ef4444', '#f59e0b', '#10b981', '#06b6d4'];
+
+    pwd.addEventListener('input', () => {
+        const v = pwd.value;
+        let score = 0;
+        if (v.length >= 6) score++;
+        if (v.length >= 10) score++;
+        if (/[A-Z]/.test(v) && /[0-9]/.test(v)) score++;
+        if (/[^A-Za-z0-9]/.test(v)) score++;
+
+        bars.forEach((b, i) => {
+            b.style.background = i < score ? colors[score - 1] : 'rgba(255,255,255,0.08)';
+        });
+    });
+</script>
 </body>
 </html>
