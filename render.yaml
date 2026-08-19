@@ -11,20 +11,28 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     envVars:
-      - key: SPRING_DATASOURCE_URL
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
         fromDatabase:
           name: opac-db
-          property: jdbcConnectionString
-      - key: SPRING_DATASOURCE_USERNAME
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: opac-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: opac-db
+          property: database
+      - key: DB_USERNAME
         fromDatabase:
           name: opac-db
           property: user
-      - key: SPRING_DATASOURCE_PASSWORD
+      - key: DB_PASSWORD
         fromDatabase:
           name: opac-db
           property: password
-      - key: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
-        value: org.hibernate.dialect.PostgreSQLDialect
       - key: PORT
         value: 8081
       - key: MAIL_USERNAME
