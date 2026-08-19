@@ -1,31 +1,418 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Manage Users</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Manage Users – OPAC Library System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333333;
+            --navbar-bg: #2c3e50;
+            --navbar-link: #ecf0f1;
+            --card-bg: #ffffff;
+            --card-border: #e0e0e0;
+            --card-shadow: rgba(0,0,0,0.03);
+            --heading-color: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --table-border: #e5e7eb;
+            --table-hover: #f9fafb;
+            --table-header-bg: #f9fafb;
+            --avatar-bg: linear-gradient(135deg, #3498db, #2980b9);
+            --avatar-text: #ffffff;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f0c29;
+            --text-color: #f3f4f6;
+            --navbar-bg: #1a1a2e;
+            --navbar-link: rgba(255,255,255,0.7);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --card-shadow: rgba(0, 0, 0, 0.4);
+            --heading-color: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.5);
+            --table-border: rgba(255, 255, 255, 0.05);
+            --table-hover: rgba(255, 255, 255, 0.02);
+            --table-header-bg: rgba(255, 255, 255, 0.08);
+            --avatar-bg: linear-gradient(135deg, #7c3aed, #ec4899);
+            --avatar-text: #ffffff;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-attachment: fixed;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .navbar {
+            background-color: var(--navbar-bg);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background-color: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .logo-text h1 { font-size: 18px; font-weight: 700; color: #fff; }
+        .logo-text p  { font-size: 11px; color: #bdc3c7; }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .nav-link {
+            color: var(--navbar-link);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #fff;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .btn-logout {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            transition: background-color 0.15s;
+        }
+        .btn-logout:hover {
+            background-color: #c0392b;
+        }
+
+        /* Nav-level Theme Toggle Switch */
+        .theme-toggle-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            outline: none;
+        }
+        .theme-toggle-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .header-section {
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--heading-color);
+        }
+        .header-section p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+        .btn-back:hover {
+            background: var(--table-header-bg);
+            transform: translateX(-2px);
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            overflow-x: auto;
+            box-shadow: var(--card-shadow);
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        .user-table th, .user-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--table-border);
+            font-size: 14.5px;
+        }
+        .user-table th {
+            color: var(--text-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--table-border);
+            background-color: var(--table-header-bg);
+            opacity: 0.85;
+        }
+        .user-table tr:last-child td {
+            border-bottom: none;
+        }
+        .user-table tbody tr:hover {
+            background: var(--table-hover);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--avatar-bg);
+            color: var(--avatar-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .role-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .role-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 99px;
+            text-transform: uppercase;
+        }
+        .badge-user {
+            background-color: rgba(59,130,246,0.15);
+            color: #3b82f6;
+            border: 1px solid rgba(59,130,246,0.25);
+        }
+        .badge-librarian {
+            background-color: rgba(16,185,129,0.15);
+            color: #10b981;
+            border: 1px solid rgba(16,185,129,0.25);
+        }
+        .badge-admin {
+            background-color: rgba(139,92,246,0.15);
+            color: #8b5cf6;
+            border: 1px solid rgba(139,92,246,0.25);
+        }
+
+        body.dark-mode .badge-user {
+            background-color: rgba(59,130,246,0.2);
+            color: #60a5fa;
+        }
+        body.dark-mode .badge-librarian {
+            background-color: rgba(16,185,129,0.2);
+            color: #34d399;
+        }
+        body.dark-mode .badge-admin {
+            background-color: rgba(139,92,246,0.2);
+            color: #a78bfa;
+        }
+
+        .role-form {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-color);
+            user-select: none;
+            opacity: 0.85;
+        }
+        .checkbox-container input {
+            cursor: pointer;
+            accent-color: #3498db;
+            width: 16px; height: 16px;
+        }
+        .btn-update {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+        .btn-update:hover {
+            background-color: #2980b9;
+        }
+    </style>
 </head>
 <body>
-<h2>Users</h2>
-<table>
-    <thead><tr><th>Username</th><th>Email</th><th>Roles</th><th>Action</th></tr></thead>
-    <tbody>
-    <tr th:each="u : ${users}">
-        <td th:text="${u.username}"></td>
-        <td th:text="${u.email}"></td>
-        <td>
-            <span th:each="r : ${u.roles}" th:text="${r.name} + ' '"></span>
-        </td>
-        <td>
-            <form th:action="@{'/admin/users/' + ${u.id} + '/roles'}" method="post">
-                <label><input type="checkbox" name="roles" value="ROLE_USER"/> USER</label>
-                <label><input type="checkbox" name="roles" value="ROLE_LIBRARIAN"/> LIBRARIAN</label>
-                <label><input type="checkbox" name="roles" value="ROLE_ADMIN"/> ADMIN</label>
-                <button type="submit">Update</button>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">📚</div>
+            <div class="logo-text">
+                <h1>OPAC</h1>
+                <p>Library Management System</p>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/admin/dashboard}" class="nav-link">Dashboard</a>
+            <a th:href="@{/admin/users}" class="nav-link active">Manage Users</a>
+            <a th:href="@{/}" class="nav-link">Books CRUD</a>
+            
+            <button id="theme-toggle" class="theme-toggle-btn">
+                <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+            </button>
+            
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">Logout ↗</button>
             </form>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<p><a th:href="@{/admin/dashboard}">Back</a></p>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header-section">
+            <div>
+                <h2>Manage Users</h2>
+                <p>Grant or revoke administrator and librarian privileges.</p>
+            </div>
+            <a th:href="@{/admin/dashboard}" class="btn-back">← Back to Dashboard</a>
+        </div>
+
+        <div class="glass-panel">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email Address</th>
+                        <th>Assigned Roles</th>
+                        <th>Update Permissions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="u : ${users}">
+                        <td>
+                            <div class="user-info">
+                                <div class="avatar" th:text="${#strings.substring(u.username,0,1).toUpperCase()}">U</div>
+                                <span th:text="${u.username}" style="font-weight:600; color:var(--heading-color);">username</span>
+                            </div>
+                        </td>
+                        <td th:text="${u.email}">email@example.com</td>
+                        <td>
+                            <div class="role-badges">
+                                <span th:each="r : ${u.roles}" 
+                                      th:text="${#strings.replace(r.name,'ROLE_','')}" 
+                                      th:classappend="${r.name == 'ROLE_ADMIN' ? 'badge-admin' : (r.name == 'ROLE_LIBRARIAN' ? 'badge-librarian' : 'badge-user')}" 
+                                      class="role-badge">ROLE</span>
+                            </div>
+                        </td>
+                        <td>
+                            <form th:action="@{'/admin/users/' + ${u.id} + '/roles'}" method="post" class="role-form">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="roles" value="ROLE_USER" th:checked="${#lists.contains(u.roles.![name], 'ROLE_USER')}"/>
+                                    USER
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="roles" value="ROLE_LIBRARIAN" th:checked="${#lists.contains(u.roles.![name], 'ROLE_LIBRARIAN')}"/>
+                                    LIBRARIAN
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="roles" value="ROLE_ADMIN" th:checked="${#lists.contains(u.roles.![name], 'ROLE_ADMIN')}"/>
+                                    ADMIN
+                                </label>
+                                <button type="submit" class="btn-update">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeIcon.textContent = '☀️';
+            themeText.textContent = 'Light Mode';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            let theme = 'light';
+            if (document.body.classList.contains('dark-mode')) {
+                theme = 'dark';
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light Mode';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark Mode';
+            }
+            localStorage.setItem('theme', theme);
+        });
+    </script>
 </body>
 </html>

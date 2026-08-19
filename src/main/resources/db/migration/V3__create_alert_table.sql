@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS alert (
+  id BIGSERIAL NOT NULL,
+  user_id BIGINT NOT NULL,
+  message VARCHAR(555) NOT NULL,
+  created_at TIMESTAMP NOT NULL,
+  is_read BOOLEAN NOT NULL DEFAULT FALSE,
+  PRIMARY KEY (id)
+);
+
+ALTER TABLE alert ADD CONSTRAINT fk_alert_user FOREIGN KEY (user_id) REFERENCES users (id);

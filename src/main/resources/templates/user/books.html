@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System – Books Catalog</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --card-border: #e0e0e0;
+            --input-bg: #ffffff;
+            --input-border: #ddd;
+            --input-text: #333333;
+            --table-header: #f2f2f2;
+            --table-border: #dddddd;
+            --table-row-hover: #f5f5f5;
+            --header-bg: #2c3e50;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f0c29;
+            --text-color: #f3f4f6;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --input-bg: rgba(255, 255, 255, 0.07);
+            --input-border: rgba(255, 255, 255, 0.12);
+            --input-text: #ffffff;
+            --table-header: rgba(255, 255, 255, 0.08);
+            --table-border: rgba(255, 255, 255, 0.05);
+            --table-row-hover: rgba(255, 255, 255, 0.02);
+            --header-bg: #1a1a2e;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-attachment: fixed;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--header-bg);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        
+        header h1 {
+            margin: 0;
+        }
+        
+        .search-bar {
+            display: flex;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--input-text);
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .search-bar button:hover {
+            background-color: #2980b9;
+        }
+        
+        .main-content {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .books-list {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .books-list h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+        
+        .book-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .book-table th, .book-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--table-border);
+        }
+        
+        .book-table th {
+            background-color: var(--table-header);
+            font-weight: 600;
+        }
+        
+        .book-table tr:hover {
+            background-color: var(--table-row-hover);
+        }
+        
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .notification {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .notification.success {
+            background-color: #d5f5e3;
+            color: #27ae60;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .notification.error {
+            background-color: #fadbd8;
+            color: #e74c3c;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        .alert-box {
+            background: rgba(231, 76, 60, 0.15); 
+            border-left: 5px solid #e74c3c; 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            margin-bottom: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            color: var(--text-color);
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <h1>Library Management System</h1>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button id="theme-toggle" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 20px; padding: 6px 16px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px; font-family: inherit; font-weight: 500; outline: none; transition: background 0.2s;">
+                    <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+                </button>
+                <form th:action="@{/logout}" method="post" style="display:inline; margin: 0;">
+                    <button type="submit" style="background: #e74c3c; border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 20px; padding: 6px 16px; cursor: pointer; font-size: 14px; font-weight: 500; font-family: inherit; outline: none; transition: background 0.2s;">Logout ↗</button>
+                </form>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Alerts Container -->
+        <div id="alerts-container" style="display: none; margin-top: 10px; margin-bottom: 10px;"></div>
+
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search by title or author...">
+            <button id="search-button">Search</button>
+        </div>
+        
+        <div id="notification" class="notification"></div>
+        
+        <div class="main-content">
+            <!-- Books List -->
+            <div class="books-list">
+                <h2>Books Catalog</h2>
+                <div class="loader" id="loader"></div>
+                <table class="book-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>ISBN</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="books-table-body">
+                        <!-- Book data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- My Loans List -->
+            <div class="books-list">
+                <h2>My Borrowed Books</h2>
+                <div class="loader" id="loans-loader" style="display: none;"></div>
+                <table class="book-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th>Returned Date</th>
+                            <th>Status</th>
+                            <th>Fine</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="loans-table-body">
+                        <!-- Loan data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Theme toggle functionality
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeIcon.textContent = '☀️';
+            themeText.textContent = 'Light Mode';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            let theme = 'light';
+            if (document.body.classList.contains('dark-mode')) {
+                theme = 'dark';
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light Mode';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark Mode';
+            }
+            localStorage.setItem('theme', theme);
+        });
+
+        // API Base URLs
+        const API_BASE_URL = '/api/books';
+        const LOANS_API_URL = '/api/loans';
+        const ALERTS_API_URL = '/api/alerts';
+        
+        // DOM Elements
+        const booksTableBody = document.getElementById('books-table-body');
+        const loansTableBody = document.getElementById('loans-table-body');
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const notification = document.getElementById('notification');
+        const loader = document.getElementById('loader');
+        const loansLoader = document.getElementById('loans-loader');
+        const alertsContainer = document.getElementById('alerts-container');
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBooks();
+            loadLoans();
+            loadAlerts();
+        });
+        searchButton.addEventListener('click', handleSearch);
+        searchInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                handleSearch();
+            }
+        });
+        
+        // Show loader
+        function showLoader() {
+            loader.style.display = 'block';
+        }
+        
+        // Hide loader
+        function hideLoader() {
+            loader.style.display = 'none';
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = 'notification ' + type;
+            notification.style.display = 'block';
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Load all books
+        async function loadBooks() {
+            try {
+                showLoader();
+                const response = await fetch(API_BASE_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const books = await response.json();
+                displayBooks(books);
+            } catch (error) {
+                showNotification('Failed to load books: ' + error.message, 'error');
+                console.error('Error loading books:', error);
+            } finally {
+                hideLoader();
+            }
+        }
+        
+        // Display books in the table
+        function displayBooks(books) {
+            booksTableBody.innerHTML = '';
+            
+            if (books.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="4" style="text-align: center;">No books found</td>
+                `;
+                booksTableBody.appendChild(row);
+                return;
+            }
+            
+            books.forEach(book => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.isbn}</td>
+                    <td>
+                        <button class="btn btn-primary btn-borrow" data-id="${book.id}">Borrow</button>
+                    </td>
+                `;
+                booksTableBody.appendChild(row);
+                
+                row.querySelector('.btn-borrow').addEventListener('click', () => borrowBook(book.id, book.title));
+            });
+        }
+
+        // Borrow Book
+        async function borrowBook(bookId, bookTitle) {
+            try {
+                const response = await fetch(`${LOANS_API_URL}/borrow/${bookId}`, {
+                    method: 'POST'
+                });
+                if (!response.ok) {
+                    throw new Error(`Failed to borrow book. Status: ${response.status}`);
+                }
+                showNotification(`Successfully borrowed "${bookTitle}"!`, 'success');
+                loadLoans();
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        }
+
+        // Load Loans
+        async function loadLoans() {
+            try {
+                loansLoader.style.display = 'block';
+                const response = await fetch(`${LOANS_API_URL}/my`);
+                if (!response.ok) {
+                    throw new Error(`Failed to load loan history.`);
+                }
+                const loans = await response.json();
+                displayLoans(loans);
+            } catch (error) {
+                console.error('Error loading loans:', error);
+            } finally {
+                loansLoader.style.display = 'none';
+            }
+        }
+
+        // Display Loans in the table
+        function displayLoans(loans) {
+            loansTableBody.innerHTML = '';
+            if (loans.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="8" style="text-align: center;">You have no borrowed books</td>
+                `;
+                loansTableBody.appendChild(row);
+                return;
+            }
+
+            loans.forEach(loan => {
+                const borrowDateStr = new Date(loan.loanDate).toLocaleDateString();
+                const dueDateStr = new Date(loan.dueDate).toLocaleDateString();
+                const returnedDateStr = loan.returnedDate ? new Date(loan.returnedDate).toLocaleDateString() : '-';
+                
+                const isOverdue = loan.fine > 0;
+                const statusColor = loan.status === 'RETURNED' ? '#2ecc71' : 
+                                    loan.status === 'RETURN_REQUESTED' ? '#e67e22' : 
+                                    (isOverdue ? '#e74c3c' : '#f39c12');
+                const statusLabel = loan.status === 'RETURN_REQUESTED' ? 'PENDING RETURN' : loan.status;
+                const fineDisplay = loan.fine > 0 ? `₹${loan.fine}` : '₹0';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${loan.book.title}</td>
+                    <td>${loan.book.author}</td>
+                    <td>${borrowDateStr}</td>
+                    <td>${dueDateStr}</td>
+                    <td>${returnedDateStr}</td>
+                    <td style="color: ${statusColor}; font-weight: 600;">${statusLabel}</td>
+                    <td style="color: ${isOverdue ? '#e74c3c' : 'inherit'}; font-weight: ${isOverdue ? '600' : 'normal'};">${fineDisplay}</td>
+                    <td>
+                        ${loan.status === 'BORROWED' ? `<button class="btn btn-success btn-return" data-id="${loan.id}">Return</button>` : 
+                          loan.status === 'RETURN_REQUESTED' ? `<span style="color: #e67e22; font-weight: 500; font-size: 13px;">Pending Approval</span>` : '-'}
+                    </td>
+                `;
+                loansTableBody.appendChild(row);
+
+                if (loan.status === 'BORROWED') {
+                    row.querySelector('.btn-return').addEventListener('click', () => returnBook(loan.id, loan.book.title));
+                }
+            });
+        }
+
+        // Return Book Request
+        async function returnBook(loanId, bookTitle) {
+            try {
+                const response = await fetch(`${LOANS_API_URL}/return/${loanId}`, {
+                    method: 'POST'
+                });
+                if (!response.ok) {
+                    throw new Error(`Failed to request book return. Status: ${response.status}`);
+                }
+                showNotification(`Successfully requested return for "${bookTitle}"! Pending admin approval.`, 'success');
+                loadLoans();
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        }
+
+        // Load Alerts
+        async function loadAlerts() {
+            try {
+                const response = await fetch(`${ALERTS_API_URL}/my`);
+                if (!response.ok) throw new Error();
+                const alerts = await response.json();
+                displayAlerts(alerts);
+            } catch (error) {
+                console.error('Failed to load alerts.');
+            }
+        }
+
+        // Display Alerts
+        function displayAlerts(alerts) {
+            alertsContainer.innerHTML = '';
+            if (alerts.length === 0) {
+                alertsContainer.style.display = 'none';
+                return;
+            }
+
+            alertsContainer.style.display = 'block';
+            alerts.forEach(alert => {
+                const timeStr = new Date(alert.createdAt).toLocaleString();
+                const alertEl = document.createElement('div');
+                alertEl.className = 'alert-box';
+                alertEl.innerHTML = `
+                    <div>
+                        <strong style="color: #e74c3c; font-size: 15px;">⚠️ Alert:</strong>
+                        <span style="margin-left: 8px; font-weight: 500;">${alert.message}</span>
+                        <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">Received on: ${timeStr}</div>
+                    </div>
+                    <button class="dismiss-btn" data-id="${alert.id}" style="background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-color); font-weight: bold; opacity: 0.7; transition: opacity 0.2s; outline: none; margin-left: 15px;">&times;</button>
+                `;
+                alertsContainer.appendChild(alertEl);
+
+                alertEl.querySelector('.dismiss-btn').addEventListener('click', () => dismissAlert(alert.id, alertEl));
+            });
+        }
+
+        // Dismiss Alert
+        async function dismissAlert(alertId, alertEl) {
+            try {
+                const response = await fetch(`${ALERTS_API_URL}/read/${alertId}`, {
+                    method: 'POST'
+                });
+                if (!response.ok) throw new Error();
+                alertEl.style.display = 'none';
+                // Reload alerts count/display just in case
+                setTimeout(loadAlerts, 300);
+            } catch (error) {
+                console.error('Failed to dismiss alert.');
+            }
+        }
+        
+        // Handle search
+        async function handleSearch() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                loadBooks();
+                return;
+            }
+            
+            try {
+                showLoader();
+                const response = await fetch(`${API_BASE_URL}/search?query=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const books = await response.json();
+                displayBooks(books);
+            } catch (error) {
+                showNotification('Search failed: ' + error.message, 'error');
+                console.error('Error searching books:', error);
+            } finally {
+                hideLoader();
+            }
+        }
+    </script>
+</body>
+</html>

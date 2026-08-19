@@ -61,4 +61,9 @@ public class UserService {
         admin.setEnabled(true);
         userRepository.save(admin);
     }
+
+    public void createUserIfNotExists(String username, String email, String rawPassword) {
+        if (userRepository.findByUsername(username).isPresent()) return;
+        registerNewUser(username, email, rawPassword);
+    }
 }

@@ -1,12 +1,370 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin Dashboard – OPAC Library System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333333;
+            --navbar-bg: #2c3e50;
+            --navbar-link: #ecf0f1;
+            --card-bg: #ffffff;
+            --card-border: #e0e0e0;
+            --card-shadow: rgba(0,0,0,0.03);
+            --card-shadow-hover: rgba(0,0,0,0.06);
+            --heading-color: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --action-bg: #f8f9fa;
+            --action-border: #e9ecef;
+            --action-hover: #f1f3f5;
+            --action-hover-border: #dee2e6;
+            --stat-icon-bg: #ebf5fb;
+            --stat-icon-color: #3498db;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f0c29;
+            --text-color: #f3f4f6;
+            --navbar-bg: #1a1a2e;
+            --navbar-link: rgba(255,255,255,0.7);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --card-shadow: rgba(0, 0, 0, 0.4);
+            --card-shadow-hover: rgba(0, 0, 0, 0.5);
+            --heading-color: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.5);
+            --action-bg: rgba(255, 255, 255, 0.02);
+            --action-border: rgba(255, 255, 255, 0.05);
+            --action-hover: rgba(255, 255, 255, 0.06);
+            --action-hover-border: rgba(255, 255, 255, 0.12);
+            --stat-icon-bg: rgba(52, 152, 219, 0.15);
+            --stat-icon-color: #3498db;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-attachment: fixed;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .navbar {
+            background-color: var(--navbar-bg);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background-color: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .logo-text h1 { font-size: 18px; font-weight: 700; color: #fff; }
+        .logo-text p  { font-size: 11px; color: #bdc3c7; }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .nav-link {
+            color: var(--navbar-link);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #fff;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .btn-logout {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            transition: background-color 0.15s;
+        }
+        .btn-logout:hover {
+            background-color: #c0392b;
+        }
+
+        /* Nav-level Theme Toggle Switch */
+        .theme-toggle-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            outline: none;
+        }
+        .theme-toggle-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .header-section {
+            margin-bottom: 32px;
+        }
+        .header-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--heading-color);
+        }
+        .header-section p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        .stat-info h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        .stat-info p {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-top: 6px;
+        }
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background-color: var(--stat-icon-bg);
+            color: var(--stat-icon-color);
+        }
+
+        .actions-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: var(--card-shadow);
+        }
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .action-card {
+            background: var(--action-bg);
+            border: 1px solid var(--action-border);
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.15s;
+            text-decoration: none;
+            color: inherit;
+        }
+        .action-card:hover {
+            background: var(--action-hover);
+            border-color: var(--action-hover-border);
+            transform: translateY(-2px);
+        }
+        .action-icon {
+            font-size: 24px;
+        }
+        .action-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--heading-color);
+        }
+        .action-card p {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        .action-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: auto;
+        }
+        .action-card:hover .action-link {
+            color: #2980b9;
+        }
+    </style>
 </head>
 <body>
-<h2>Admin Dashboard</h2>
-<p>Manage users, roles, and books from the admin panel.</p>
-<p><a th:href="@{/}">Go to Books CRUD Page</a></p>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">📚</div>
+            <div class="logo-text">
+                <h1>OPAC</h1>
+                <p>Library Management System</p>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/admin/dashboard}" class="nav-link active">Dashboard</a>
+            <a th:href="@{/admin/users}" class="nav-link">Manage Users</a>
+            <a th:href="@{/}" class="nav-link">Books CRUD</a>
+            
+            <button id="theme-toggle" class="theme-toggle-btn">
+                <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+            </button>
+            
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">Logout ↗</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header-section">
+            <h2>Admin Control Panel</h2>
+            <p>Welcome back, Administrator. Monitor system status and manage system resources.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total Users</h3>
+                    <p>Active</p>
+                </div>
+                <div class="stat-icon icon-blue">👥</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>OPAC Catalog</h3>
+                    <p>Live</p>
+                </div>
+                <div class="stat-icon icon-green">📖</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>System Status</h3>
+                    <p>Healthy</p>
+                </div>
+                <div class="stat-icon icon-orange">⚡</div>
+            </div>
+        </div>
+
+        <div class="actions-panel">
+            <h3 class="panel-title">Administrative Tasks</h3>
+            <div class="actions-grid">
+                <a th:href="@{/admin/users}" class="action-card">
+                    <div class="action-icon">🔑</div>
+                    <h4>Manage Users & Roles</h4>
+                    <p>Assign privileges to users including LIBRARIAN and ADMIN. Update permissions instantly.</p>
+                    <div class="action-link">Open User Panel →</div>
+                </a>
+                <a th:href="@{/}" class="action-card">
+                    <div class="action-icon">📚</div>
+                    <h4>Books CRUD Page</h4>
+                    <p>Add, edit, view, or remove books directly from the main Online Public Access Catalog.</p>
+                    <div class="action-link">Open Books Catalog →</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeIcon.textContent = '☀️';
+            themeText.textContent = 'Light Mode';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            let theme = 'light';
+            if (document.body.classList.contains('dark-mode')) {
+                theme = 'dark';
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light Mode';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark Mode';
+            }
+            localStorage.setItem('theme', theme);
+        });
+    </script>
 </body>
 </html>

@@ -9,7 +9,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        // Redirect root to index.html
-        registry.addViewController("/").setViewName("forward:/index.html");
+        // Custom routing managed by ViewController
     }
 }

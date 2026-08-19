@@ -1,16 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Management System</title>
+    <title>Library Management System – Admin Catalog</title>
     <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --card-border: #e0e0e0;
+            --input-bg: #ffffff;
+            --input-border: #ddd;
+            --input-text: #333333;
+            --table-header: #f2f2f2;
+            --table-border: #dddddd;
+            --table-row-hover: #f5f5f5;
+            --header-bg: #2c3e50;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f0c29;
+            --text-color: #f3f4f6;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --input-bg: rgba(255, 255, 255, 0.07);
+            --input-border: rgba(255, 255, 255, 0.12);
+            --input-text: #ffffff;
+            --table-header: rgba(255, 255, 255, 0.08);
+            --table-border: rgba(255, 255, 255, 0.05);
+            --table-row-hover: rgba(255, 255, 255, 0.02);
+            --header-bg: #1a1a2e;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-attachment: fixed;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
         
         .container {
@@ -20,10 +51,11 @@
         }
         
         header {
-            background-color: #2c3e50;
+            background-color: var(--header-bg);
             color: white;
             padding: 20px 0;
             text-align: center;
+            transition: background-color 0.3s;
         }
         
         header h1 {
@@ -39,10 +71,13 @@
         .search-bar input {
             flex: 1;
             padding: 10px;
-            border: 1px solid #ddd;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--input-text);
             border-right: none;
             border-radius: 4px 0 0 4px;
             font-size: 16px;
+            transition: all 0.2s;
         }
         
         .search-bar button {
@@ -67,15 +102,17 @@
         
         .book-form {
             flex: 1;
-            background-color: white;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
             padding: 20px;
             border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s;
         }
         
         .book-form h2 {
             margin-top: 0;
-            color: #2c3e50;
+            color: var(--text-color);
         }
         
         .form-group {
@@ -91,9 +128,12 @@
         .form-group input {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--input-text);
             border-radius: 4px;
             font-size: 16px;
+            transition: all 0.2s;
         }
         
         .form-actions {
@@ -130,15 +170,17 @@
         
         .books-list {
             flex: 2;
-            background-color: white;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
             padding: 20px;
             border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s;
         }
         
         .books-list h2 {
             margin-top: 0;
-            color: #2c3e50;
+            color: var(--text-color);
         }
         
         .book-table {
@@ -149,16 +191,16 @@
         .book-table th, .book-table td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--table-border);
         }
         
         .book-table th {
-            background-color: #f2f2f2;
+            background-color: var(--table-header);
             font-weight: 600;
         }
         
         .book-table tr:hover {
-            background-color: #f5f5f5;
+            background-color: var(--table-row-hover);
         }
         
         .action-buttons {
@@ -232,8 +274,17 @@
 </head>
 <body>
     <header>
-        <div class="container">
-            <h1>Library Management System</h1>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <h1>Library Management System (Admin)</h1>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a th:href="@{/admin/dashboard}" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 20px; padding: 6px 16px; text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s;">Admin Dashboard</a>
+                <button id="theme-toggle" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 20px; padding: 6px 16px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px; font-family: inherit; font-weight: 500; outline: none; transition: background 0.2s;">
+                    <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+                </button>
+                <form th:action="@{/logout}" method="post" style="display:inline; margin: 0;">
+                    <button type="submit" style="background: #e74c3c; border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 20px; padding: 6px 16px; cursor: pointer; font-size: 14px; font-weight: 500; font-family: inherit; outline: none; transition: background 0.2s;">Logout ↗</button>
+                </form>
+            </div>
         </div>
     </header>
     
@@ -245,6 +296,7 @@
         
         <div id="notification" class="notification"></div>
         
+        <!-- Existing Book CRUD Section -->
         <div class="main-content">
             <div class="book-form">
                 <h2 id="form-title">Add New Book</h2>
@@ -287,11 +339,85 @@
                 </table>
             </div>
         </div>
+
+        <!-- NEW: Loans Monitoring and Alerts Section -->
+        <div class="main-content" style="margin-top: 40px; border-top: 2px solid var(--card-border); padding-top: 30px;">
+            <!-- Send Alert Panel -->
+            <div class="book-form" style="flex: 1;">
+                <h2>Send Alert to User</h2>
+                <form id="alert-form" style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label for="alert-user-select">Select User</label>
+                        <select id="alert-user-select" required style="width: 100%; padding: 10px; background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text); border-radius: 4px; font-size: 16px; font-family: inherit; outline: none; transition: all 0.2s;">
+                            <option value="">-- Choose User --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="alert-message">Alert Message</label>
+                        <textarea id="alert-message" required placeholder="Enter alert message (e.g. Please return Gatsby)" style="width: 100%; height: 100px; padding: 10px; background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text); border-radius: 4px; font-size: 16px; font-family: inherit; resize: vertical; outline: none; transition: all 0.2s; box-sizing: border-box;"></textarea>
+                    </div>
+                    <div class="form-actions" style="margin-top: 15px;">
+                        <button type="submit" style="background-color: #e67e22; color: white;" class="btn">Send Alert</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Loan Monitor Table -->
+            <div class="books-list" style="flex: 2;">
+                <h2>Loan Monitoring & Fines</h2>
+                <div class="loader" id="loans-loader" style="display: none;"></div>
+                <table class="book-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Book Title</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th>Returned Date</th>
+                            <th>Status</th>
+                            <th>Fine</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="loans-table-body">
+                        <!-- Loan monitor data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     
     <script>
-        // API Base URL - Using relative URL to avoid CORS issues
+        // Theme toggle functionality
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeIcon.textContent = '☀️';
+            themeText.textContent = 'Light Mode';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            let theme = 'light';
+            if (document.body.classList.contains('dark-mode')) {
+                theme = 'dark';
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light Mode';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark Mode';
+            }
+            localStorage.setItem('theme', theme);
+        });
+
+        // API Base URLs
         const API_BASE_URL = '/api/books';
+        const LOANS_API_URL = '/api/loans';
+        const ALERTS_API_URL = '/api/alerts';
         
         // DOM Elements
         const bookForm = document.getElementById('book-form');
@@ -307,9 +433,20 @@
         const searchButton = document.getElementById('search-button');
         const notification = document.getElementById('notification');
         const loader = document.getElementById('loader');
+
+        // New Loan/Alert DOM Elements
+        const loansTableBody = document.getElementById('loans-table-body');
+        const loansLoader = document.getElementById('loans-loader');
+        const alertForm = document.getElementById('alert-form');
+        const alertUserSelect = document.getElementById('alert-user-select');
+        const alertMessage = document.getElementById('alert-message');
         
         // Event Listeners
-        document.addEventListener('DOMContentLoaded', loadBooks);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBooks();
+            loadLoans();
+            loadUsersForAlerts();
+        });
         bookForm.addEventListener('submit', handleFormSubmit);
         resetButton.addEventListener('click', resetForm);
         searchButton.addEventListener('click', handleSearch);
@@ -318,8 +455,7 @@
                 handleSearch();
             }
         });
-        
-        // Functions
+        alertForm.addEventListener('submit', handleAlertSubmit);
         
         // Show loader
         function showLoader() {
@@ -515,6 +651,131 @@
             bookIdInput.value = '';
             formTitle.textContent = 'Add New Book';
             submitButton.textContent = 'Add Book';
+        }
+
+        // NEW: Load all system loans for Admin monitoring
+        async function loadLoans() {
+            try {
+                loansLoader.style.display = 'block';
+                const response = await fetch(`${LOANS_API_URL}/all`);
+                if (!response.ok) throw new Error();
+                const loans = await response.json();
+                displayLoans(loans);
+            } catch (error) {
+                console.error('Error loading admin loans monitoring');
+            } finally {
+                loansLoader.style.display = 'none';
+            }
+        }
+
+        // Display Loans in admin table
+        function displayLoans(loans) {
+            loansTableBody.innerHTML = '';
+            if (loans.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="8" style="text-align: center;">No borrow/loan records in system</td>`;
+                loansTableBody.appendChild(row);
+                return;
+            }
+
+            loans.forEach(loan => {
+                const borrowDateStr = new Date(loan.loanDate).toLocaleDateString();
+                const dueDateStr = new Date(loan.dueDate).toLocaleDateString();
+                const returnedDateStr = loan.returnedDate ? new Date(loan.returnedDate).toLocaleDateString() : '-';
+                
+                const isOverdue = loan.fine > 0;
+                const statusColor = loan.status === 'RETURNED' ? '#2ecc71' : 
+                                    loan.status === 'RETURN_REQUESTED' ? '#e67e22' : 
+                                    (isOverdue ? '#e74c3c' : '#f39c12');
+                const statusLabel = loan.status === 'RETURN_REQUESTED' ? 'PENDING RETURN' : loan.status;
+                const fineDisplay = loan.fine > 0 ? `₹${loan.fine}` : '₹0';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${loan.user.username}</strong></td>
+                    <td>${loan.book.title}</td>
+                    <td>${borrowDateStr}</td>
+                    <td>${dueDateStr}</td>
+                    <td>${returnedDateStr}</td>
+                    <td style="color: ${statusColor}; font-weight: 600;">${statusLabel}</td>
+                    <td style="color: ${isOverdue ? '#e74c3c' : 'inherit'}; font-weight: ${isOverdue ? '600' : 'normal'};">${fineDisplay}</td>
+                    <td>
+                        ${loan.status === 'RETURN_REQUESTED' ? 
+                          `<button class="btn btn-success btn-approve-return" data-id="${loan.id}" style="background-color: #2ecc71; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px;">Approve</button>` : 
+                          '-'}
+                    </td>
+                `;
+                loansTableBody.appendChild(row);
+
+                if (loan.status === 'RETURN_REQUESTED') {
+                    row.querySelector('.btn-approve-return').addEventListener('click', () => approveReturn(loan.id, loan.book.title, loan.user.username));
+                }
+            });
+        }
+
+        // Approve Return Request
+        async function approveReturn(loanId, bookTitle, username) {
+            try {
+                showLoader();
+                const response = await fetch(`${LOANS_API_URL}/approve/${loanId}`, {
+                    method: 'POST'
+                });
+                if (!response.ok) {
+                    throw new Error(`Failed to approve return. Status: ${response.status}`);
+                }
+                showNotification(`Successfully approved return of "${bookTitle}" from user "${username}"!`, 'success');
+                loadLoans();
+            } catch (error) {
+                showNotification(error.message, 'error');
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // NEW: Load users for the alert compose dropdown
+        async function loadUsersForAlerts() {
+            try {
+                const response = await fetch(`${ALERTS_API_URL}/users`);
+                if (!response.ok) throw new Error();
+                const users = await response.json();
+                
+                // Populate select option
+                alertUserSelect.innerHTML = '<option value="">-- Choose User --</option>';
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.username} (${user.email})`;
+                    alertUserSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading users for alerts selection');
+            }
+        }
+
+        // NEW: Send alert notification to user
+        async function handleAlertSubmit(event) {
+            event.preventDefault();
+            const userId = alertUserSelect.value;
+            const message = alertMessage.value.trim();
+
+            if (!userId || !message) return;
+
+            try {
+                const response = await fetch(`${ALERTS_API_URL}/send`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId: parseInt(userId), message: message })
+                });
+
+                if (!response.ok) throw new Error();
+                
+                showNotification('Alert message sent successfully!', 'success');
+                alertForm.reset();
+            } catch (error) {
+                showNotification('Failed to send alert.', 'error');
+            }
         }
     </script>
 </body>

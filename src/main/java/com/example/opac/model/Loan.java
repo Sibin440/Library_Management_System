@@ -22,6 +22,7 @@ public class Loan {
     private LocalDateTime dueDate;
     private LocalDateTime returnedDate;
     private String status;
+    private boolean reminderSent = false;
 
     public Loan() {}
 
@@ -40,4 +41,19 @@ public class Loan {
     public void setReturnedDate(LocalDateTime returnedDate) { this.returnedDate = returnedDate; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public boolean isReminderSent() { return reminderSent; }
+    public void setReminderSent(boolean reminderSent) { this.reminderSent = reminderSent; }
+
+    @Transient
+    public int getFine() {
+        if (dueDate == null) {
+            return 0;
+        }
+        LocalDateTime end = (returnedDate != null) ? returnedDate : LocalDateTime.now();
+        if (end.isAfter(dueDate)) {
+            long days = java.time.temporal.ChronoUnit.DAYS.between(dueDate, end);
+            return (int) (days * 1); // ₹1 fine per day overdue
+        }
+        return 0;
+    }
 }

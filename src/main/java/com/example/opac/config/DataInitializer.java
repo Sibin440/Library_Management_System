@@ -32,9 +32,11 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initUsers(UserService userService) {
         return args -> {
-            // create roles and an admin user if not present
+            // create roles and default users if not present
             userService.createAdminIfNotExists("admin", "admin@example.com", "adminpass");
             System.out.println("Ensured admin user exists (username=admin)");
+            userService.createUserIfNotExists("user", "user@example.com", "userpass");
+            System.out.println("Ensured normal user exists (username=user)");
         };
     }
 }
