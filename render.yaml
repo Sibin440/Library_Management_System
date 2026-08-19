@@ -1,15 +1,34 @@
+databases:
+  - name: opac-db
+    databaseName: opac
+    user: opac_user
+    plan: free
+
 services:
   - type: web
     name: opac-app
     runtime: docker
     dockerfilePath: ./Dockerfile
+    plan: free
     envVars:
       - key: SPRING_DATASOURCE_URL
-        value: jdbc:postgresql://dpg-d9hf72rtqb8s739fhecg-a/opac_db_k7f0
+        fromDatabase:
+          name: opac-db
+          property: jdbcConnectionString
       - key: SPRING_DATASOURCE_USERNAME
-        value: opac_user
+        fromDatabase:
+          name: opac-db
+          property: user
       - key: SPRING_DATASOURCE_PASSWORD
-        value: 265zH6CIGl3VhjCAWPSOWaout5k8sXQw
+        fromDatabase:
+          name: opac-db
+          property: password
       - key: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
         value: org.hibernate.dialect.PostgreSQLDialect
+      - key: PORT
+        value: 8081
+      - key: MAIL_USERNAME
+        value: sibin9122@gmail.com
+      - key: MAIL_PASSWORD
+        value: kpmapqxtkztmmeid
     healthCheckPath: /actuator/health
